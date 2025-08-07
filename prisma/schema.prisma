@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Shop {
+  id          String   @id @default(cuid())
+  name        String
+  location    String
+  image       String
+  type        String   // "たこ焼き", "ピザ", etc
+  dish        String   // "和食", "洋食", "中華", etc
+  rating      Float    @default(0.0)
+  reviewCount Int      @default(0) @map("review_count")
+  description String
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  reviews     Review[]
+  
+  @@map("shops")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  firebaseUid String @unique @map("firebase_uid")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  reviews   Review[]
+  
+  @@map("users")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Float    @db.Real
+  comment   String?
+  shopId    String   @map("shop_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([shopId, userId])
+  @@map("reviews")
+}

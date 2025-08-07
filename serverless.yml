@@ -1,0 +1,87 @@
+service: nomnom-backend
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-northeast-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    STAGE: ${self:provider.stage}
+    DATABASE_URL: ${env:DATABASE_URL}
+    FIREBASE_PROJECT_ID: ${env:FIREBASE_PROJECT_ID, ''}
+    FIREBASE_PRIVATE_KEY: ${env:FIREBASE_PRIVATE_KEY, ''}
+    FIREBASE_CLIENT_EMAIL: ${env:FIREBASE_CLIENT_EMAIL, ''}
+  httpApi:
+    cors:
+      allowedOrigins:
+        - https://localhost:3000
+        - https://*.vercel.app
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+
+functions:
+  # Health Check
+  health:
+    handler: src/handlers/health.handler
+    events:
+      - httpApi:
+          path: /health
+          method: get
+
+  # Shop APIs
+  getShops:
+    handler: src/handlers/shops.getShops
+    events:
+      - httpApi:
+          path: /shops
+          method: get
+
+  getShop:
+    handler: src/handlers/shops.getShop
+    events:
+      - httpApi:
+          path: /shops/{id}
+          method: get
+
+  createShop:
+    handler: src/handlers/shops.createShop
+    events:
+      - httpApi:
+          path: /shops
+          method: post
+
+  updateShop:
+    handler: src/handlers/shops.updateShop
+    events:
+      - httpApi:
+          path: /shops/{id}
+          method: put
+
+  deleteShop:
+    handler: src/handlers/shops.deleteShop
+    events:
+      - httpApi:
+          path: /shops/{id}
+          method: delete
+
+custom:
+  serverless-offline:
+    httpPort: 3001
+  
+package:
+  exclude:
+    - node_modules/prisma/**
+    - prisma/migrations/**
