@@ -36,7 +36,10 @@ export const getShops = async (
       offset = 0,
       sortBy = 'createdAt',
       sortOrder = 'desc'
-    } = queryParams
+    } = queryParams as Required<typeof queryParams> & {
+      limit: number
+      offset: number
+    }
 
     let where: Prisma.ShopWhereInput = {
       isActive: true

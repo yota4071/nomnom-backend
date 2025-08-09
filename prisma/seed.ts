@@ -89,11 +89,15 @@ async function main() {
   console.log('Start seeding...')
   
   for (const shop of sampleShops) {
-    await prisma.shop.upsert({
-      where: { name: shop.name },
-      update: {},
-      create: shop
+    const existingShop = await prisma.shop.findFirst({
+      where: { name: shop.name }
     })
+    
+    if (!existingShop) {
+      await prisma.shop.create({
+        data: shop
+      })
+    }
   }
   
   console.log('Seeding completed!')

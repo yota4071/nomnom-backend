@@ -23,8 +23,14 @@ export const shopQuerySchema = z.object({
   type: z.string().optional(),
   search: z.string().optional(),
   location: z.string().optional(),
-  limit: z.string().transform(Number).refine(n => n > 0 && n <= 100, 'Limit must be between 1 and 100').optional(),
-  offset: z.string().transform(Number).refine(n => n >= 0, 'Offset must be >= 0').optional(),
+  limit: z.preprocess(
+    (val) => val ? Number(val) : undefined,
+    z.number().min(1).max(100).optional()
+  ),
+  offset: z.preprocess(
+    (val) => val ? Number(val) : undefined,
+    z.number().min(0).optional()
+  ),
   sortBy: z.enum(['rating', 'name', 'createdAt']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional()
 })
