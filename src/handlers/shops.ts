@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda'
 import { Prisma } from '@prisma/client'
-import prisma from '../lib/db'
+// import prisma from '../lib/db'
+import { mockPrisma as prisma } from '../lib/db-mock'
 import { successResponse, errorResponse, paginationResponse } from '../lib/response'
 import { validateBody, validateQueryParams, shopCreateSchema, shopUpdateSchema, shopQuerySchema } from '../lib/validator'
 import { Shop, ShopCreateInput, ShopUpdateInput, ShopQueryParams } from '../shared/types'
